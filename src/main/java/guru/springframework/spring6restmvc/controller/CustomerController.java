@@ -21,6 +21,10 @@ public class CustomerController {
 
     private final CustomerService customerService;
 
+    @RequestMapping(method= RequestMethod.POST)
+    public Customer createCustomer(@PathVariable("customer)") Customer customer){
+        return customerService.createCustomer(customer);
+    }
     @RequestMapping(method = RequestMethod.GET)
     public List<Customer> listAllCustomers(){
         return customerService.getAllCustomers();
