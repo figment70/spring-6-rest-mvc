@@ -67,7 +67,7 @@ public class CustomerServiceImpl implements CustomerService {
 
         customerMap.put(newCustomer.getId(), newCustomer);
 
-        return customer;
+        return newCustomer;
     }
 }
 
