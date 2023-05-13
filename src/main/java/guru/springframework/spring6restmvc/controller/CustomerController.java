@@ -22,12 +22,12 @@ public class CustomerController {
     private final CustomerService customerService;
 
     @PutMapping("{customerId}")
-    public ResponseEntity handlePut(@PathVariable("customerId") UUID customerId,@RequestBody Customer customer){
+    public ResponseEntity updateCustomer(@PathVariable("customerId") UUID customerId,@RequestBody Customer customer){
         customerService.saveCustomer(customerId, customer);
         return new ResponseEntity(HttpStatus.NO_CONTENT);
     }
     @PostMapping
-    public ResponseEntity handlePost(@RequestBody Customer customer){
+    public ResponseEntity saveCustomer(@RequestBody Customer customer){
         Customer savedCustomer = customerService.saveNewCustomer(customer);
 
         HttpHeaders headers = new HttpHeaders();
