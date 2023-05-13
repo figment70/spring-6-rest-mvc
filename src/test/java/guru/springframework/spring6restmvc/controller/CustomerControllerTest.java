@@ -1,6 +1,7 @@
 package guru.springframework.spring6restmvc.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import guru.springframework.spring6restmvc.model.Beer;
 import guru.springframework.spring6restmvc.model.Customer;
 import guru.springframework.spring6restmvc.services.CustomerService;
 import guru.springframework.spring6restmvc.services.CustomerServiceImpl;
@@ -14,6 +15,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,13 +41,16 @@ class CustomerControllerTest {
 
     CustomerServiceImpl customerServiceImpl;
 
+    @Captor
+    ArgumentCaptor<UUID> uuidArgumentCaptor;
+
+    @Captor
+    ArgumentCaptor<Customer> customerArgumentCaptor;
+
     @BeforeEach
     void setUp() {
         customerServiceImpl = new CustomerServiceImpl();
     }
-
-    @Captor
-    ArgumentCaptor<UUID> uuidArgumentCaptor;
 
     @Test
     void testDeleteCustomer() throws Exception {
@@ -114,6 +120,26 @@ class CustomerControllerTest {
                 .andExpect(jsonPath("$.name", is(customer.getName())));
 
     }
+
+    @Test
+    void testPatchCustomer() throws Exception {
+        Customer customer = customerServiceImpl.getAllCustomers().get(0);
+
+        Map<String, Object> customerMap = new HashMap<>();
+        customerMap.put("name", "New Name");
+
+        mockMvc.perform(patch("/api/v1/customer/" + customer.getId())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .accept(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(customerMap)))
+                .andExpect(status().isNoContent());
+
+        verify(customerService).patchCustomerById(uuidArgumentCaptor.capture(), customerArgumentCaptor.capture());
+
+        assertThat(customer.getId()).isEqualTo(uuidArgumentCaptor.getValue());
+        assertThat(customerMap.get("name")).isEqualTo(customerArgumentCaptor.getValue().getName());
+    }
+
 }
 
 
